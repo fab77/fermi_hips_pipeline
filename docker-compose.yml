@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  fermibottle:
+    # image: fssc/fermibottle:latest
+    image: fermihips:latest
+    container_name: fermihips_container
+    # user: fermi
+    volumes:
+      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/newdata:/fermihips/newdata
+      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/hips:/fermihips/hips
+      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/working:/fermihips/working
+      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/last_week.txt:/fermihips/last_week.txt
+    stdin_open: true
+    tty: true
