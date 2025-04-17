@@ -32,14 +32,14 @@ else
     exit -1
 fi
 
-# echo "${LOG_PREFIX} ### Step2  - Generating HEALPix (counts and exposure) files with FERMI Tools [fermiTools_step.sh] (1000 3000 MeV)"
-# sh run_one_band.sh 1000 3000
-# if [ $? -eq 0 ]; then
-#     echo "${LOG_PREFIX} (1000 3000 MeV) DONE"
-# else
-#     echo "${LOG_PREFIX} (1000 3000 MeV) not updated as an error occurred in one previous step. Exiting"
-#     exit -1
-# fi
+echo "${LOG_PREFIX} ### Step2  - Generating HEALPix (counts and exposure) files with FERMI Tools [fermiTools_step.sh] (1000 3000 MeV)"
+sh run_one_band.sh 1000 3000
+if [ $? -eq 0 ]; then
+    echo "${LOG_PREFIX} (1000 3000 MeV) DONE"
+else
+    echo "${LOG_PREFIX} (1000 3000 MeV) not updated as an error occurred in one previous step. Exiting"
+    exit -1
+fi
 
 
 echo "${LOG_PREFIX} ### Step2  - Generating HEALPix (counts and exposure) file with FERMI Tools [fermiTools_step.sh] (3000 10000 MeV)"
