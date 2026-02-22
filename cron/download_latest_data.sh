@@ -86,17 +86,11 @@ fi
 echo "New diffuse list: $NEW_DIFF_FILE"
 echo "New spacecraft list: $NEW_SC_FILE"
 
-docker run -v /Volumes/MyHD/FERMI/hips:/fermihips/hips \
--v /Volumes/MyHD/FERMI/working:/fermihips/working \
--v /Volumes/MyHD/FERMI/data/diffuse:/fermihips/newdata/diffuse \
--v /Volumes/MyHD/FERMI/data/spacecraft:/fermihips/newdata/spacecraft \
--v $NEW_DIFF_FILE:/fermihips/new_diffuse_list.txt \
--v $NEW_SC_FILE:/fermihips/new_spacecraft_list.txt \
-fermihips sh /fermihips/run_fermihips.sh \
-    -o 10 \
-    -m 1000 \
-    -M 3000 \
-    -d /fermihips/new_diffuse_list.txt \ 
-    -s /fermihips/new_spacecraft_list.txt
+docker run -it -v /Volumes/MyHD/FERMI/test/hips:/fermihips/hips   \
+    -v /Volumes/MyHD/FERMI/test/working:/fermihips/working   \
+    -v /Volumes/MyHD/FERMI/test/data/diffuse:/fermihips/newdata/diffuse   \
+    -v /Volumes/MyHD/FERMI/test/data/spacecraft:/fermihips/newdata/spacecraft   \
+    -v /Volumes/MyHD/FERMI/test/data/new_diffuse_list.txt:/fermihips/new_diffuse_list.txt   \
+    -v /Volumes/MyHD/FERMI/test/data/new_spacecraft_list.txt:/fermihips/new_spacecraft_list.txt   \
+    fermihips_v2  /fermihips/run_fermihips.sh -o 10 -m 1000 -M 3000 -d /fermihips/new_diffuse_list.txt -s /fermihips/new_spacecraft_list.txt
 
-# docker run -v /Volumes/MyHD/FERMI/test/hips:/fermihips/hips -v /Volumes/MyHD/FERMI/test/working:/fermihips/working -v /Volumes/MyHD/FERMI/test/data/diffuse:/fermihips/newdata/diffuse -v /Volumes/MyHD/FERMI/test/data/spacecraft:/fermihips/newdata/spacecraft -v /Volumes/MyHD/FERMI/test/data/new_diffuse_list.txt:/fermihips/new_diffuse_list.txt -v /Volumes/MyHD/FERMI/test/data/new_spacecraft_list.txt:/fermihips/new_spacecraft_list.txt fermihips_v2 sh /fermihips/run_fermihips.sh     -o 10     -m 1000     -M 3000     -d /fermihips/new_diffuse_list.txt     -s /fermihips/new_spacecraft_list.txt
