@@ -49,7 +49,7 @@ Before running the image, ensure you have:
 ## 🛠️ Build the Docker Image
 
 ```bash
-docker build -t fermihips .
+docker build -t fermihips_v2 .
 ```
 
 ## ▶️ Run the Docker Image

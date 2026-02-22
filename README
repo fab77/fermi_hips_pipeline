@@ -33,14 +33,14 @@ loop on RA 0..360
 
 
 # IMAGE BUILD
-docker build -t fermihips .
+docker build -t fermihips_v2 .
 
 # IMAGE RUN
 docker-compose up
 
 docker exec -it f09 sudo su - fermi; /bin/bash
 docker exec -it f09 sudo su - fermi; cd /fermihips; sh run_all.sh
-docker run -it fermihips source /opt/anaconda/etc/profile.d/conda.sh && conda activate fermi
+docker run -it fermihips_v2 source /opt/anaconda/etc/profile.d/conda.sh && conda activate fermi
 docker run -it -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/newdata:/fermihips/newdata -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/hips:/fermihips/hips -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/working:/fermihips/working -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/last_week.txt:/fermihips/last_week.txt fermihips sh /fermihips/run_all.sh
 
 
