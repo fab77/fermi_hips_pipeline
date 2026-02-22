@@ -1,22 +1,32 @@
 import os
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 from astropy.io import fits
+from healpy.newvisufunc import projview, newprojplot
+from healpy.visufunc import cartview, mollview
 
-# count_file = "./data/working/proc4/lat_source_zmax90_gt1gev_ccube.fits"
-# exp_file = "./data/working/proc4/lat_source_zmax90_gt1gev_expcube.fits" # cm x cm x seg
 
-in_dir = "/Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/working/fermi_1_3gev/"
-healpix_filename = "final_healpix_degrees.fits"
+parser = argparse.ArgumentParser(description="Plot Fermi HEALPix maps generated via FermiTools.")
+parser.add_argument("indir", type=str, help="Input directory path containing the HEALPix FITS file.")
+parser.add_argument("hpxfile", type=str, help="Name of the HEALPix FITS file to plot.")
+args = parser.parse_args()
+
+in_dir = args.indir
+healpix_filename = args.hpxfile
 healpix_file = os.path.join (in_dir, healpix_filename)
 
 map = hp.read_map(healpix_file)
-hp.mollview(
-    map,
-    norm="log",
-    min=1e-11,
-    # min=1,
-    )
-hp.graticule()
+# projview(map, coord=["G"], norm="log", flip="astro", projection_type="mollweide", min=1e-11)
+# cartview( map, coord=["G"], norm="log", flip="astro", min=1e-11, lonra=[0, 10], latra=[-5,5])
+cartview( map, coord=["G"], flip="astro",  lonra=[0, 10], latra=[-5,5], cmap="nipy_spectral")
+
+# hp.mollview(
+#     map,
+#     norm="log",
+#     min=1e-11,
+#     # min=1,
+#     )
+# hp.graticule()
 plt.show()

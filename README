@@ -1,0 +1,48 @@
+# Creating HiPS file from HEALPix file (myhealpix.fits) generated with FREMI Tools:
+
+$ java -jar HiPSgen.jar in=./myhealpix.fits out=./hipsout/ creator_did=fab
+
+
+
+# Once the HiPS has been created move to the ROOT directory of the HiPS
+$ cd /Users/fabriziogiordano/Desktop/PhD/code/fermi/hipsgen/hipsout/UNK.AUTH_P_fab
+
+# Run node server to serve the HiPS through HTTP
+$ npx serve --cors
+
+# Open the browser to http://localhost:3000/
+
+
+# IDEA
+2 nested loop based on pixel size (depending on healpix order). 
+
+orig_healpix = healpix_map
+nside = ...
+final_helpix = healpix(nside)
+// convert to radians!!!
+loop on RA 0..360
+    loop on Dec -90..90 (colatitude instead?)
+        
+        
+        orig_pixel_index = orig_healpix.ang2pix(nside, dec, ra)
+        orig_pixel_value = healpix_map[orig_pixel_index]
+
+        final_pix = final_helpix.ang2pix(ra, dec)
+        // create FITS(final_pix) if doesn't exists
+        // write orig_pixel_value in final_pix coords
+
+
+# IMAGE BUILD
+docker build -t fermihips .
+
+# IMAGE RUN
+docker-compose up
+
+docker exec -it f09 sudo su - fermi; /bin/bash
+docker exec -it f09 sudo su - fermi; cd /fermihips; sh run_all.sh
+docker run -it fermihips source /opt/anaconda/etc/profile.d/conda.sh && conda activate fermi
+docker run -it -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/newdata:/fermihips/newdata -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/hips:/fermihips/hips -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/working:/fermihips/working -v /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/last_week.txt:/fermihips/last_week.txt fermihips sh /fermihips/run_all.sh
+
+
+# SERVE HiPS
+npx serve --cors

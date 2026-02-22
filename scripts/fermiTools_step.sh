@@ -53,8 +53,9 @@ fi
 # tmin=INDEF and tmax=INDEF → Time range (use INDEF for unspecified).
 # emin=1000 and emax=500000 → Energy range in MeV (1 GeV to 3 GeV).
 # zmax=90 → Maximum zenith angle in degrees (to reduce Earth limb contamination).
-echo "In gtselect"
+echo "In gtselect: Filters events based on user-defined criteria, including energy range and region of interest."
 gtselect evclass=128 evtype=3 infile=@$INFILE outfile=$OUTFILE ra=$RA dec=$DEC rad=$RAD tmin=INDEF tmax=INDEF emin=$EMIN emax=$EMAX zmax=$ZMAX
+#gtselect evclass=128 evtype=3 infile=/fermihips/working/filelist.txt outfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90.fits ra=0 dec=0 rad=180 tmin=INDEF tmax=INDEF emin=1000 emax=3000 zmax=90
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtselect ERROR"
     exit -1
@@ -76,8 +77,9 @@ OUTFILE="${OUTDIR}/diffuse_source_zmax90_gti.fits"
 # roicut=no → No additional ROI-based zenith angle cut.
 # evfile=diffuse_source_zmax90_1-3gev.fits → Input event data file (from gtselect output).
 # outfile=diffuse_source_zmax90_1-3gev_gti.fits → Output file with GTI (Good Time Intervals) applied.
-echo "In gtmktime"
+echo "In gtmktime: Applies quality cuts to select good time intervals (GTIs), ensuring data reliability based on spacecraft conditions."
 gtmktime scfile=$SCFILE filter="$FILTER" roicut=$ROICUT evfile=$EVFILE outfile=$OUTFILE
+# gtmktime scfile=/fermihips/working/spacecraft.fits filter="DATA_QUAL>0 && LAT_CONFIG==1 && ABS(ROCK_ANGLE)<52" roicut=no evfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90.fits outfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_gti.fits
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtmktime ERROR"
     exit -1
@@ -111,10 +113,14 @@ ENUMBINS=1
 # gtbin algorithm=HEALPIX evfile=diffuse_source_zmax90_gti.fits outfile=diffuse_source_zmax90_ccube.fits \
 #     scfile=spacecraft.fits hpx_order=12 hpx_ordering_scheme=RING coordsys=GAL \
 #     ebinalg=LOG emin=1000 emax=500000 enumbins=1 hpx_ebin=yes hpx_region=""
-echo "In gtbin"
+echo "In gtbin: ins filtered events into a HEALPix map, producing a spatial distribution
+of gamma-ray counts."
 gtbin algorithm=HEALPIX evfile=$EVFILE outfile=$OUTFILE scfile=$SCFILE \
       hpx_ordering_scheme=$ORDERING hpx_order=$HPX_ORDER coordsys=$COORDSYS \
       ebinalg=$EBINALG emin=$EMIN emax=$EMAX enumbins=$ENUMBINS hpx_ebin=yes hpx_region=""
+# gtbin algorithm=HEALPIX evfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_gti.fits outfile=/fermihips/working/fermi_1_3gev//diffuse_source_zmax90_ccube.fits scfile=/fermihips/working/spacecraft.fits \
+#      hpx_ordering_scheme=RING hpx_order=12 coordsys=GAL \
+#      ebinalg=LOG emin=1000 emax=3000 enumbins=1 hpx_ebin=yes hpx_region=""
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtbin ERROR"
     exit -1
@@ -133,8 +139,9 @@ BINSZ=1
 # zmax=90 → Maximum zenith angle (degrees) to avoid Earth limb contamination.
 # dcostheta=0.025 → Step size in cos(θ) (smaller values give better accuracy).
 # binsz=1 → Pixel size in degrees (affects spatial resolution).
-echo "In gtltcube"
+echo "In gtltcube: Creates the livetime cube, representing the total observation time across the sky."
 gtltcube evfile=$EVFILE scfile=$SCFILE outfile=$OUTFILE zmax=$ZMAX dcostheta=$DCOSTHETA binsz=$BINSZ
+# gtltcube evfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_gti.fits scfile=/fermihips/working/spacecraft.fits outfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_ltcube.fits zmax=90 dcostheta=0.025 binsz=1
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtltcube ERROR"
     exit -1
@@ -151,8 +158,11 @@ IRFS="P8R3_SOURCE_V3"
 # cmap=diffuse_source_zmax90_1-3gev_ccube.fits → Input counts map (from gtbin output).
 # outfile=diffuse_source_zmax90_1-3gev_expcube.fits → Output exposure map.
 # irfs=P8R3_SOURCE_V3 → Instrument response function (IRF) used. Ensure this matches the event class (evclass=128 corresponds to P8R3_SOURCE_V3 for Pass 8 data).
-echo "In gtexpcube2"
-gtexpcube2 infile=$LTCUBE cmap=$CCUBE outfile=$OUTFILE irfs=$IRFS
+echo "In gtexpcube2: Generates the exposure map by combining the livetime cube with the instrument response functions."
+gtexpcube2 infile=$LTCUBE cmap=$CCUBE outfile=$OUTFILE irfs=$IRFS hpx_ordering_scheme=RING hpx_order=$HPX_ORDER coordsys=GAL ebinalg=LOG emin=1000 emax=3000 enumbins=1
+# gtexpcube2 infile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_ltcube.fits cmap=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_ccube.fits outfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90_expcube.fits irfs=P8R3_SOURCE_V3 \
+# hpx_ordering_scheme=RING hpx_order=10 coordsys=GAL \
+#     ebinalg=LOG emin=1000 emax=3000 enumbins=1
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtexpcube2 ERROR"
     exit -1

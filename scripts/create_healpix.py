@@ -19,6 +19,7 @@ energy_param_2 = args.energy_param_2
 
 # Build directories based on energy params
 in_dir = f"./working/fermi_{energy_param_1}_{energy_param_2}gev"
+# in_dir = f"/Volumes/MyHD/FERMI/output/working/fermi_{energy_param_1}_{energy_param_2}gev"
 out_dir = in_dir
 count_file = os.path.join (in_dir, "diffuse_source_zmax90_ccube.fits")
 exp_file = os.path.join (out_dir, "diffuse_source_zmax90_expcube.fits") # cm x cm x seg

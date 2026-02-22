@@ -7,9 +7,9 @@ services:
     container_name: fermihips_container
     # user: fermi
     volumes:
-      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/newdata:/fermihips/newdata
-      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/hips:/fermihips/hips
-      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/test/working:/fermihips/working
-      - /Users/fabriziogiordano/Desktop/PhD/code/fermi_pipeline/last_week.txt:/fermihips/last_week.txt
+      - /Volumes/MyHD/FERMI/input/newdata:/fermihips/newdata
+      - /Volumes/MyHD/FERMI/output/hips:/fermihips/hips
+      - /Volumes/MyHD/FERMI/output/working:/fermihips/working
+      - /Volumes/MyHD/FERMI/output/last_week.txt:/fermihips/last_week.txt
     stdin_open: true
     tty: true

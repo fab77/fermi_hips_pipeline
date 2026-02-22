@@ -1,11 +1,14 @@
 # Base image
-FROM fssc/fermibottle
+FROM fssc/fermibottle:25.05.13.1.arm64
 
 # Set the working directory inside the container
 WORKDIR /fermihips
 
 # Use root to install packages and copy files
 USER root
+
+COPY environment.yml .
+RUN conda env update -n fermi -f environment.yml
 
 # Install Java 17
 RUN yum install -y java-17-openjdk java-17-openjdk-devel && \
