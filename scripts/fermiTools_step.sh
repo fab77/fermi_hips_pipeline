@@ -1,28 +1,42 @@
 #!/bin/bash
 
+export HEADASNOQUERY=1
+export HEADASPROMPT=/dev/null
+
+# fermiTools_step.sh: Script to run the Fermi Tools steps for a given energy range and HEALPix order.
+# This script is called by run_fermihips.sh and performs the following steps:
+# 1. gtselect: Selects events based on energy range and region of interest.
+# 2. gtmktime: Applies quality cuts to select good time intervals (GTIs).
+# 3. gtbin: Bins the selected events into a HEALPix map (counts map).
+# 4. gtltcube: Creates the livetime cube.
+# 5. gtexpcube2: Generates the exposure map by combining the livetime cube with the instrument response functions.
+
 LOG_PREFIX="[fermiTools_step.sh]-> "
 
 # EMIN=1000 # in mev
 # EMAX=3000 # in mev
 EMIN=$1 # in mev
 EMAX=$2 # in mev
+HPX_ORDER=$3 # integer, e.g., 10 or 12
+DIFFUSE_FILE=$4
+SPACECRAFT_FILE=$5
 
-# sudo su - fermi
-source /opt/anaconda/etc/profile.d/conda.sh
-conda activate fermi
-# punlearn gtselect
+# source /opt/anaconda/etc/profile.d/conda.sh
+# conda activate fermi
 
 WORKDIR="/fermihips/working/"
-mkdir ${WORKDIR}
-# cd /fermihips/working
-ls newdata/rcdiff_lat_photon_weekly_w* > ${WORKDIR}/filelist.txt
-ls newdata/lat_spacecraft_weekly_w* > ${WORKDIR}/spacecraftlist.txt
-ftmerge @${WORKDIR}/spacecraftlist.txt ${WORKDIR}/spacecraft.fits lastkey='TSTOP,DATE-END' clobber=yes
+mkdir -p ${WORKDIR}
 
+
+ftmerge @${SPACECRAFT_FILE} ${WORKDIR}/spacecraft.fits lastkey='TSTOP,DATE-END' clobber=yes
+if [ $? -ne 0 ]; then 
+    echo "${LOG_PREFIX} ftmerge ERROR"
+    exit -1
+fi
+echo "${LOG_PREFIX} ftmerge DONE"
+SCFILE="${WORKDIR}/spacecraft.fits"
 # Run gtselect
 # Parameters
-INFILE="${WORKDIR}/filelist.txt"
-SCFILE="${WORKDIR}/spacecraft.fits"
 RA=0
 DEC=0
 RAD=180
@@ -54,7 +68,7 @@ fi
 # emin=1000 and emax=500000 → Energy range in MeV (1 GeV to 3 GeV).
 # zmax=90 → Maximum zenith angle in degrees (to reduce Earth limb contamination).
 echo "In gtselect: Filters events based on user-defined criteria, including energy range and region of interest."
-gtselect evclass=128 evtype=3 infile=@$INFILE outfile=$OUTFILE ra=$RA dec=$DEC rad=$RAD tmin=INDEF tmax=INDEF emin=$EMIN emax=$EMAX zmax=$ZMAX
+gtselect evclass=128 evtype=3 infile=$DIFFUSE_FILE outfile=$OUTFILE ra=$RA dec=$DEC rad=$RAD tmin=INDEF tmax=INDEF emin=$EMIN emax=$EMAX zmax=$ZMAX
 #gtselect evclass=128 evtype=3 infile=/fermihips/working/filelist.txt outfile=/fermihips/working/fermi_1_3gev/diffuse_source_zmax90.fits ra=0 dec=0 rad=180 tmin=INDEF tmax=INDEF emin=1000 emax=3000 zmax=90
 if [ $? -ne 0 ]; then 
     echo "${LOG_PREFIX} gtselect ERROR"
@@ -92,7 +106,6 @@ echo "${LOG_PREFIX} gtmktime DONE"
 EVFILE="${OUTDIR}/diffuse_source_zmax90_gti.fits"
 OUTFILE="${OUTDIR}/diffuse_source_zmax90_ccube.fits"
 ORDERING="RING"
-HPX_ORDER=12
 COORDSYS="GAL"
 EBINALG="LOG"
 ENUMBINS=1

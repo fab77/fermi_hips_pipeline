@@ -1,7 +1,6 @@
 name: fermi
 channels:
   - fermi/label/dev
-  - https://anaconda.org/conda-forge/fermipy/1.4.0/download
   - fermi
   - conda-forge
 dependencies:
