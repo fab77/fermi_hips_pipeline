@@ -1,11 +1,8 @@
 import os
 import argparse
 import matplotlib.pyplot as plt
-import numpy as np
 import healpy as hp
-from astropy.io import fits
-from healpy.newvisufunc import projview, newprojplot
-from healpy.visufunc import cartview, mollview
+from healpy.visufunc import cartview
 
 
 parser = argparse.ArgumentParser(description="Plot Fermi HEALPix maps generated via FermiTools.")

@@ -1,9 +1,7 @@
 import os
 import argparse
-import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
-from astropy.io import fits
 
 # energy_param_1 = argparse ....
 # energy_param_2 = argparse ....
@@ -66,14 +64,6 @@ counts_per_degrees = result_reshaped / pixel_area_deg
 # Flatten back to 1D
 map_deg = counts_per_degrees.ravel()
 hp.write_map(os.path.join(out_dir,"final_healpix_degrees.fits"), map_deg, overwrite=True)
-
-
-
-
-
-
-
-
 
 
 # my_map = os.path.join(out_dir,"myhealpix_degrees.fits")

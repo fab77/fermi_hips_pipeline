@@ -3,7 +3,7 @@ version: '3.8'
 services:
   fermibottle:
     # image: fssc/fermibottle:latest
-    image: fermihips:25.05.13.1.arm64
+    image: fermihips:25.05.15.1.amd64
     container_name: fermihips_container
     # user: fermi
     volumes:

@@ -102,35 +102,49 @@ echo "Spacecraft file list: ${NEW_SC}"
 # ----------------------------
 # Main Processing Loop
 # ----------------------------
-echo "Generating HEALPix (counts and exposure) files with FERMI Tools [fermiTools_step.sh] (${ENERGY_MIN} ${ENERGY_MAX} MeV) and HPX_ORDER ${HPX_ORDER}"
+# ----------------------------
+# Main Processing Loop
+# ----------------------------
+
+echo "Generating HEALPix with Fermi Tools..."
 /fermihips/fermiTools_step.sh "$ENERGY_MIN" "$ENERGY_MAX" "$HPX_ORDER" "$NEW_DIFFUSE" "$NEW_SC"
-if [ $? -ne 0 ]; then
-    echo "Error in fermiTools_step.sh for $ENERGY_MIN $ENERGY_MAX $HPX_ORDER $NEW_DIFFUSE $NEW_SC."
-    exit -1
+
+EMIN_gev=$((ENERGY_MIN / 1000))
+EMAX_gev=$((ENERGY_MAX / 1000))
+
+echo "Creating final HEALPix files..."
+python3 /fermihips/create_healpix.py "$EMIN_gev" "$EMAX_gev"
+
+echo "Generating HiPS..."
+/fermihips/run_hipsgen.sh \
+    "/fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/final_healpix_degrees.fits" \
+    "/fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/hips/" \
+    "$EMIN_gev" "$EMAX_gev"
+
+SRC_DIR="/fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/hips/UAM_P_Fermi_${EMIN_gev}_${EMAX_gev}gev"
+DST_DIR="/fermihips/hips/UAM_P_Fermi_${EMIN_gev}_${EMAX_gev}gev"
+
+if [[ ! -d "$SRC_DIR" ]]; then
+    echo "ERROR: Source HiPS directory not found: $SRC_DIR"
+    exit 1
 fi
 
-EMIN_gev=`echo $(( ${ENERGY_MIN}/1000 ))`
-EMAX_gev=`echo $(( ${ENERGY_MAX}/1000 ))`
-
-echo "Creating final HEALPix files [create_healpix.py] ${ENERGY_MIN} ${ENERGY_MAX} MeV"
-python3 /fermihips/create_healpix.py ${EMIN_gev} ${EMAX_gev}
-if [ $? -ne 0 ]; then
-    echo "Error in create_healpix.py for ${EMIN_gev}GeV ${EMAX_gev}GeV."
-    exit -1
+# Check if a valid HiPS dataset already exists
+if [[ ! -f "$DST_DIR/properties" ]]; then
+    echo "First run: creating initial HiPS dataset..."
+    mkdir -p "$DST_DIR"
+    cp -a "$SRC_DIR/." "$DST_DIR/"
+    echo "Initial HiPS copy completed."
+else
+    echo "Incremental update: merging into existing HiPS..."
+    /fermihips/run_hipsgen_concat.sh \
+        "$SRC_DIR/" \
+        "$DST_DIR/" \
+        "UAM/P/Fermi_${EMIN_gev}_${EMAX_gev}gev"
+    echo "Incremental HiPS update complete."
 fi
 
-echo "Updating HiPS [run_hipsgen.sh] ${ENERGY_MIN} ${ENERGY_MAX} MeV"
-/fermihips/run_hipsgen.sh /fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/final_healpix_degrees.fits /fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/hips/ ${EMIN_gev} ${EMAX_gev}
-if [ $? -ne 0 ]; then
-    echo "Error in run_hipsgen.sh for fermi_${EMIN_gev}_${EMAX_gev}gev map."
-    exit -1
-fi  
+echo "HiPS update complete."
 
-echo "Merge HiPS [run_hipsgen_concat.sh] ${ENERGY_MIN}_${ENERGY_MAX}gev"
-/fermihips/run_hipsgen_concat.sh /fermihips/working/fermi_${EMIN_gev}_${EMAX_gev}gev/hips/UAM_P_Fermi_${EMIN_gev}_${EMAX_gev}gev/ /fermihips/hips/UAM_P_Fermi_${EMIN_gev}_${EMAX_gev}gev/ UAM/P/Fermi_${EMIN_gev}_${EMAX_gev}gev
-if [ $? -ne 0 ]; then
-    echo "Error in run_hipsgen_concat.sh for fermi_${EMIN_gev}_${EMAX_gev}gev map."
-    exit -1
-fi
 
-echo "Incremental HiPS update complete."
+
