@@ -62,8 +62,7 @@ docker run -it \
 
 Replace /path/to/hips and /path/to/last_week.txt with your actual paths.
 
-docker run -it \
-  -v /Volumes/MyHD/FERMI/output/hips:/fermihips/hips \
-  -v /Volumes/MyHD/FERMI/input/newdata:/fermihips/newdata \
-  -v /Volumes/MyHD/FERMI/output/working:/fermihips/working \
-fermihips /bin/bash
+docker run -v /data/fermi_data/test/hips:/fermihips/hips    -v /data/fermi_data/diffuse:/fermihips/newdata/diffuse   -v /data/fermi_data/spacecraft:/fermihips/newdata/spacecraft   -v /data/fermi_data/test/new_diffuse_list.txt:/fermihips/new_diffuse_list.txt   -v /data/fermi_data/test/new_spacecraft_list.txt:/fermihips/new_spacecraft_list.txt   fermihips_v2 /fermihips/run_fermihips.sh  -o 10 -m 1000 -M 3000   -d /fermihips/new_diffuse_list.txt   -s /fermihips/new_spacecraft_list.txt
+
+# For testing pourpose, you might want to keep the temporary "working" folder visible outside the docker by persisting it in the host:
+docker run -v /data/fermi_data/test/working:/fermihips/working -v /data/fermi_data/test/hips:/fermihips/hips    -v /data/fermi_data/diffuse:/fermihips/newdata/diffuse   -v /data/fermi_data/spacecraft:/fermihips/newdata/spacecraft   -v /data/fermi_data/test/new_diffuse_list.txt:/fermihips/new_diffuse_list.txt   -v /data/fermi_data/test/new_spacecraft_list.txt:/fermihips/new_spacecraft_list.txt   fermihips_v2 /fermihips/run_fermihips.sh  -o 10 -m 1000 -M 3000   -d /fermihips/new_diffuse_list.txt   -s /fermihips/new_spacecraft_list.txt
