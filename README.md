@@ -62,7 +62,6 @@ docker run -it \
 
 Replace /path/to/hips and /path/to/last_week.txt with your actual paths.
 
-
 docker run -it \
   -v /Volumes/MyHD/FERMI/output/hips:/fermihips/hips \
   -v /Volumes/MyHD/FERMI/input/newdata:/fermihips/newdata \
